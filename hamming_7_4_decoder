@@ -1,0 +1,32 @@
+module hamming_7_4_decoder(
+    input [6:0] code_in,
+    output reg [3:0] data_out,
+    output reg error_detected
+);
+
+    wire s1, s2, s4;
+    wire [2:0] syndrome;
+    reg [6:0] corrected_code;
+
+    // Calculate syndrome bits
+    assign s1 = code_in[0] ^ code_in[2] ^ code_in[4] ^ code_in[6];
+    assign s2 = code_in[1] ^ code_in[2] ^ code_in[5] ^ code_in[6];
+    assign s4 = code_in[3] ^ code_in[4] ^ code_in[5] ^ code_in[6];
+
+    assign syndrome = {s4, s2, s1}; // Combine syndrome bits into a 3-bit number
+
+    always @(*) begin
+        corrected_code = code_in; // Default, no correction
+
+        if (syndrome != 3'b000) begin
+            error_detected = 1'b1;
+            corrected_code[syndrome - 1] = ~corrected_code[syndrome - 1]; // Flip the erroneous bit
+        end else begin
+            error_detected = 1'b0;
+        end
+
+        // Extract original data bits
+        data_out = {corrected_code[6], corrected_code[5], corrected_code[4], corrected_code[2]};
+    end
+
+endmodule
