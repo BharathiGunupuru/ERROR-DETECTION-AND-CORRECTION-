@@ -1,0 +1,37 @@
+module tb_hamming_7_4_decoder;
+
+    reg [6:0] code_in;
+    wire [3:0] data_out;
+    wire error_detected;
+
+    // Instantiate the Unit Under Test (UUT)
+    hamming_7_4_decoder uut (
+        .code_in(code_in),
+        .data_out(data_out),
+        .error_detected(error_detected)
+    );
+
+    initial begin
+        $display("Time\t Code In\t Data Out\t Error Detected");
+        $monitor("%0dns\t %b\t %b\t %b", $time, code_in, data_out, error_detected);
+
+        // No error
+        code_in = 7'b0000000; #10;
+        code_in = 7'b0000111; #10;
+        code_in = 7'b0011001; #10; 
+        code_in = 7'b0011110; #10;
+        code_in = 7'b1111111; #10;
+ 
+       	 	 
+
+        // Introduce single-bit errors manually
+        code_in = 7'b0011000; #10; // error in bit 1
+        code_in = 7'b0011000; #10; // error in bit 3
+        code_in = 7'b1011101; #10; // error in bit 2
+        code_in = 7'b0111111; #10; // error in bit 1
+
+        $finish;
+    end
+
+endmodule
+
